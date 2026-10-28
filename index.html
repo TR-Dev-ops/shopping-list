@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f6b4f">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>รายการซื้อของ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+  /* Layout: one narrow column like a paper list; sticky add bar at top, items below, clear button at the end */
+  :root {
+    --bg: #f6f7f3;
+    --surface: #ffffff;
+    --fg: #1d2420;
+    --muted: #66706a;
+    --line: #dfe3dc;
+    --accent: #2f6b4f;
+    --accent-fg: #ffffff;
+    --accent-soft: #e4efe8;
+    --danger: #b3412e;
+    --danger-soft: #f7e5e1;
+    --font-display: "Anuphan", "IBM Plex Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+    --font-body: "IBM Plex Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141815; --surface: #1d221f; --fg: #e9eee9; --muted: #9aa59e; --line: #2e3530;
+      --accent: #7cc39d; --accent-fg: #0f1a14; --accent-soft: #233229;
+      --danger: #ef8f7c; --danger-soft: #3a2420;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141815; --surface: #1d221f; --fg: #e9eee9; --muted: #9aa59e; --line: #2e3530;
+    --accent: #7cc39d; --accent-fg: #0f1a14; --accent-soft: #233229;
+    --danger: #ef8f7c; --danger-soft: #3a2420;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 20px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 48px;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  header { padding-top: 24px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: 32px; line-height: 1.2; margin: 0; text-wrap: balance; }
+  .count { color: var(--muted); font-size: 18px; font-variant-numeric: tabular-nums; }
+
+  /* Add bar */
+  .add {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); padding-block: 8px;
+    display: grid; grid-template-columns: 1fr auto; gap: 10px;
+  }
+  .add input[type="text"] {
+    grid-column: 1 / -1;
+    width: 100%; min-width: 0;
+    font: inherit; font-size: 22px; color: var(--fg);
+    background: var(--surface); border: 2px solid var(--line); border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .add input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  .add-row { grid-column: 1 / -1; display: flex; gap: 10px; align-items: stretch; }
+  .add-row .stepper { flex: 0 0 auto; }
+  .btn-add {
+    flex: 1; font: inherit; font-family: var(--font-display); font-weight: 600; font-size: 22px;
+    background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 12px;
+    padding: 12px 18px; cursor: pointer; min-height: 56px;
+  }
+
+  /* Quantity stepper */
+  .stepper {
+    display: inline-flex; align-items: center;
+    background: var(--surface); border: 2px solid var(--line); border-radius: 12px; overflow: hidden;
+  }
+  .stepper button {
+    font: inherit; font-size: 26px; line-height: 1; width: 48px; min-height: 52px;
+    background: transparent; color: var(--accent); border: 0; cursor: pointer;
+  }
+  .stepper button:disabled { color: var(--line); cursor: default; }
+  .stepper input {
+    width: 3.2ch; text-align: center; font: inherit; font-size: 22px; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--fg);
+    background: transparent; border: 0; padding: 0; -moz-appearance: textfield;
+  }
+  .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .stepper input:focus { outline: none; background: var(--accent-soft); }
+  .stepper-label { font-size: 16px; color: var(--muted); padding-left: 12px; }
+
+  /* List */
+  .section-label { font-size: 16px; color: var(--muted); letter-spacing: 0.02em; margin: 4px 0 -8px; }
+  ul { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  ul:empty { display: none; }
+  li {
+    display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px;
+    padding: 12px 12px 12px 14px; border-top: 1px solid var(--line);
+  }
+  li:first-child { border-top: 0; }
+  .check {
+    width: 36px; height: 36px; border-radius: 10px; border: 2px solid var(--muted);
+    background: transparent; cursor: pointer; display: grid; place-items: center; padding: 0;
+  }
+  .check svg { width: 22px; height: 22px; stroke: var(--accent-fg); opacity: 0; }
+  li.done .check { background: var(--accent); border-color: var(--accent); }
+  li.done .check svg { opacity: 1; }
+  .name { min-width: 0; overflow-wrap: anywhere; font-size: 22px; cursor: pointer; }
+  li.done .name { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
+  li .stepper button { width: 40px; min-height: 44px; font-size: 24px; }
+  li .stepper input { font-size: 20px; }
+  li.done .stepper { opacity: 0.5; }
+  .del {
+    width: 44px; height: 44px; border-radius: 10px; border: 0; background: transparent;
+    color: var(--muted); cursor: pointer; display: grid; place-items: center; padding: 0;
+  }
+  .del svg { width: 22px; height: 22px; stroke: currentColor; }
+  .del:hover, .del:focus-visible { color: var(--danger); background: var(--danger-soft); }
+
+  @media (max-width: 420px) {
+    li { grid-template-columns: auto 1fr auto; row-gap: 8px; }
+    li .stepper { grid-column: 2; justify-self: start; }
+    li .del { grid-column: 3; grid-row: 1; }
+  }
+
+  .empty {
+    text-align: center; color: var(--muted); padding: 36px 16px;
+    border: 2px dashed var(--line); border-radius: 14px; font-size: 20px;
+  }
+
+  /* Clear bought */
+  .clear { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+  .btn-clear, .btn-confirm, .btn-cancel {
+    font: inherit; font-size: 20px; border-radius: 12px; padding: 12px 20px; min-height: 52px; cursor: pointer;
+  }
+  .btn-clear { background: transparent; color: var(--danger); border: 2px solid var(--danger); width: 100%; }
+  .btn-confirm { background: var(--danger); color: var(--surface); border: 0; font-weight: 600; flex: 1; }
+  .btn-cancel { background: transparent; color: var(--fg); border: 2px solid var(--line); flex: 1; }
+  .confirm-text { width: 100%; text-align: center; font-size: 18px; }
+
+  .note { color: var(--muted); font-size: 15px; text-align: center; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>รายการซื้อของ</h1>
+    <span class="count" id="count"></span>
+  </header>
+
+  <form class="add" id="addForm" autocomplete="off">
+    <input type="text" id="newName" placeholder="จะซื้ออะไร เช่น ไข่ไก่" aria-label="ชื่อของที่จะซื้อ" enterkeyhint="done">
+    <div class="add-row">
+      <div class="stepper" aria-label="จำนวน">
+        <span class="stepper-label">จำนวน</span>
+        <button type="button" id="newMinus" aria-label="ลดจำนวน">−</button>
+        <input type="number" id="newQty" value="1" min="1" max="999" inputmode="numeric" aria-label="จำนวน">
+        <button type="button" id="newPlus" aria-label="เพิ่มจำนวน">+</button>
+      </div>
+      <button type="submit" class="btn-add">เพิ่ม</button>
+    </div>
+  </form>
+
+  <div id="emptyState" class="empty" hidden>ยังไม่มีรายการ<br>พิมพ์ชื่อของด้านบนแล้วกด “เพิ่ม”</div>
+
+  <ul id="todoList"></ul>
+  <p class="section-label" id="doneLabel" hidden>ซื้อแล้ว</p>
+  <ul id="doneList"></ul>
+
+  <div class="clear" id="clearBox" hidden>
+    <button type="button" class="btn-clear" id="clearBtn">ล้างรายการที่ซื้อแล้ว</button>
+  </div>
+
+  <p class="note" id="note"></p>
+</div>
+
+<script>
+(function () {
+  var LS_KEY = "shopping-list-v1";
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var DEL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+
+  var items = [];      // {id, name, qty, done, createdAt}
+  var col = null;      // db collection when shared storage is available
+  var confirming = false;
+  var qtyTimers = {};
+
+  // ---------- storage ----------
+  function loadLocal() {
+    try { var raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(items)); } catch (e) {}
+  }
+  function newId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+  function clampQty(n) {
+    n = parseInt(n, 10);
+    if (!isFinite(n) || n < 1) return 1;
+    return Math.min(n, 999);
+  }
+
+  function addItem(name, qty) {
+    var item = { id: newId(), name: name, qty: qty, done: false, createdAt: Date.now() };
+    items.push(item); afterChange();
+    if (col) col.doc(item.id).set({ name: item.name, qty: item.qty, done: false, createdAt: item.createdAt }).catch(showError);
+  }
+  function toggleItem(id) {
+    var it = find(id); if (!it) return;
+    it.done = !it.done; afterChange();
+    if (col) col.doc(id).update({ done: it.done }).catch(showError);
+  }
+  function setQty(id, qty) {
+    var it = find(id); if (!it || it.qty === qty) return;
+    it.qty = qty; afterChange();
+    if (col) {
+      clearTimeout(qtyTimers[id]);
+      qtyTimers[id] = setTimeout(function () { col.doc(id).update({ qty: it.qty }).catch(showError); }, 500);
+    }
+  }
+  function deleteItem(id) {
+    items = items.filter(function (x) { return x.id !== id; }); afterChange();
+    if (col) col.doc(id).delete().catch(showError);
+  }
+  function clearDone() {
+    var gone = items.filter(function (x) { return x.done; });
+    items = items.filter(function (x) { return !x.done; });
+    confirming = false; afterChange();
+    if (col) {
+      gone.reduce(function (p, x) {
+        return p.then(function () { return col.doc(x.id).delete(); });
+      }, Promise.resolve()).catch(showError);
+    }
+  }
+  function find(id) { for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i]; return null; }
+  function afterChange() { saveLocal(); render(); }
+  function showError() { document.getElementById("note").textContent = "บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง"; }
+
+  // ---------- render ----------
+  var todoList = document.getElementById("todoList");
+  var doneList = document.getElementById("doneList");
+
+  function rowHTML(it) {
+    var q = clampQty(it.qty);
+    return '<li data-id="' + it.id + '" class="' + (it.done ? "done" : "") + '">' +
+      '<button type="button" class="check" data-act="toggle" aria-pressed="' + it.done + '" aria-label="' + (it.done ? "ยกเลิกว่าซื้อแล้ว" : "ติ๊กว่าซื้อแล้ว") + '">' + CHECK_SVG + '</button>' +
+      '<span class="name" data-act="toggle"></span>' +
+      '<div class="stepper">' +
+        '<button type="button" data-act="minus" aria-label="ลดจำนวน"' + (q <= 1 ? " disabled" : "") + '>−</button>' +
+        '<input type="number" id="qty-' + it.id + '" data-act="qty" value="' + q + '" min="1" max="999" inputmode="numeric" aria-label="จำนวน">' +
+        '<button type="button" data-act="plus" aria-label="เพิ่มจำนวน">+</button>' +
+      '</div>' +
+      '<button type="button" class="del" data-act="delete" aria-label="ลบรายการ">' + DEL_SVG + '</button>' +
+    '</li>';
+  }
+
+  function fill(listEl, arr) {
+    listEl.innerHTML = arr.map(rowHTML).join("");
+    var names = listEl.querySelectorAll(".name");
+    arr.forEach(function (it, i) { names[i].textContent = it.name; });
+  }
+
+  function render() {
+    var active = document.activeElement;
+    var keepFocus = active && active.id && active.id.indexOf("qty-") === 0 ? active.id : null;
+
+    var sorted = items.slice().sort(function (a, b) { return a.createdAt - b.createdAt; });
+    var todo = sorted.filter(function (x) { return !x.done; });
+    var done = sorted.filter(function (x) { return x.done; });
+
+    fill(todoList, todo);
+    fill(doneList, done);
+
+    document.getElementById("emptyState").hidden = items.length > 0;
+    document.getElementById("doneLabel").hidden = done.length === 0;
+    document.getElementById("count").textContent = items.length ? "เหลือ " + todo.length + " / " + items.length + " รายการ" : "";
+
+    var box = document.getElementById("clearBox");
+    box.hidden = done.length === 0;
+    if (done.length === 0) confirming = false;
+    if (confirming) {
+      box.innerHTML = '<span class="confirm-text">ลบรายการที่ซื้อแล้ว ' + done.length + ' รายการ?</span>' +
+        '<button type="button" class="btn-cancel" id="cancelClear">ยกเลิก</button>' +
+        '<button type="button" class="btn-confirm" id="confirmClear">ลบเลย</button>';
+    } else {
+      box.innerHTML = '<button type="button" class="btn-clear" id="clearBtn">ล้างรายการที่ซื้อแล้ว (' + done.length + ')</button>';
+    }
+
+    if (keepFocus) { var el = document.getElementById(keepFocus); if (el) { el.focus(); } }
+  }
+
+  // ---------- events ----------
+  var newQty = document.getElementById("newQty");
+  function syncNewMinus() { document.getElementById("newMinus").disabled = clampQty(newQty.value) <= 1; }
+  document.getElementById("newMinus").addEventListener("click", function () { newQty.value = Math.max(1, clampQty(newQty.value) - 1); syncNewMinus(); });
+  document.getElementById("newPlus").addEventListener("click", function () { newQty.value = clampQty(clampQty(newQty.value) + 1); syncNewMinus(); });
+  newQty.addEventListener("change", function () { newQty.value = clampQty(newQty.value); syncNewMinus(); });
+  syncNewMinus();
+
+  document.getElementById("addForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var input = document.getElementById("newName");
+    var name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    addItem(name, clampQty(newQty.value));
+    input.value = ""; newQty.value = 1; syncNewMinus();
+    input.focus();
+  });
+
+  function onListClick(e) {
+    var t = e.target.closest("[data-act]"); if (!t) return;
+    var li = t.closest("li"); if (!li) return;
+    var id = li.getAttribute("data-id"); var it = find(id); if (!it) return;
+    var act = t.getAttribute("data-act");
+    if (act === "toggle") toggleItem(id);
+    else if (act === "delete") deleteItem(id);
+    else if (act === "minus") setQty(id, Math.max(1, clampQty(it.qty) - 1));
+    else if (act === "plus") setQty(id, clampQty(clampQty(it.qty) + 1));
+  }
+  function onListChange(e) {
+    if (e.target.getAttribute("data-act") !== "qty") return;
+    var id = e.target.closest("li").getAttribute("data-id");
+    setQty(id, clampQty(e.target.value));
+    render();
+  }
+  [todoList, doneList].forEach(function (el) {
+    el.addEventListener("click", onListClick);
+    el.addEventListener("change", onListChange);
+  });
+
+  document.getElementById("clearBox").addEventListener("click", function (e) {
+    if (e.target.id === "clearBtn") { confirming = true; render(); document.getElementById("cancelClear").focus(); }
+    else if (e.target.id === "cancelClear") { confirming = false; render(); }
+    else if (e.target.id === "confirmClear") clearDone();
+  });
+
+  // ---------- start ----------
+  items = loadLocal();
+  render();
+
+  if (window.claude && window.claude.use) {
+    window.claude.use("db").then(function (db) {
+      if (!db) return;
+      col = db.collection("items");
+      col.onSnapshot(function (snap) {
+        items = snap.docs.map(function (d) {
+          var x = d.data();
+          return { id: d.id, name: String(x.name || ""), qty: clampQty(x.qty), done: !!x.done, createdAt: Number(x.createdAt) || 0 };
+        });
+        saveLocal(); render();
+      }, function () {
+        col = null;
+        document.getElementById("note").textContent = "เชื่อมต่อไม่ได้ รายการจะเก็บไว้ในเครื่องนี้แทน";
+      });
+    }).catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
